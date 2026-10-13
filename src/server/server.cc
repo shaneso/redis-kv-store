@@ -108,7 +108,7 @@ int main() {
   int epollfd = epoll_create1(0);
 
   if (epollfd == -1) {
-    exit_msg(EXIT_FAILURE, "Epoll Create");
+    exit_msg(EXIT_FAILURE, "Epoll");
   }
 
   // Accept and handle client connections
