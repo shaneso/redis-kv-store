@@ -1,2 +1,1 @@
-## Redis Server
-
+# Redis Key-Value Store

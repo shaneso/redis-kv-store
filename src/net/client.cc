@@ -37,18 +37,18 @@ ssize_t query(int sockfd, const char *payload) {
   retval = recv_full(sockfd, rbuf, 4);
   // Check if EOF or receive error
   if (retval) {
-    exit_msg(EXIT_FAILURE, errno == 0 ? "EOF" : "Receive");
+    exit_msg(EXIT_FAILURE, errno == 0 ? "EOF" : "receive");
     return retval;
   }
   memcpy(&len, rbuf, 4);
   // Check for message size overflow
   if (len > BUFFER_SIZE) {
-    exit_msg(EXIT_FAILURE, "Overflow");
+    exit_msg(EXIT_FAILURE, "overflow");
     return -1;
   }
   retval = recv_full(sockfd, &rbuf[4], len);
   if (retval) {
-    exit_msg(EXIT_FAILURE, "Receive");
+    exit_msg(EXIT_FAILURE, "receive");
     return retval;
   }
   std::cout << "Server: " << &rbuf[4] << std::endl;
@@ -63,7 +63,7 @@ int main() {
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   // Check if socket handle has been returned successfully
   if (sockfd == -1)
-    exit_msg(EXIT_FAILURE, "Socket");
+    exit_msg(EXIT_FAILURE, "socket");
 
   // Initialize server socket endpoint scheme
   struct sockaddr_in cli_addr = {
@@ -79,13 +79,13 @@ int main() {
   retval = connect(sockfd, (struct sockaddr *) &cli_addr, sizeof(cli_addr));
   // Check if socket has been connected successfully
   if (retval == -1)
-    exit_msg(EXIT_FAILURE, "Connect");
+    exit_msg(EXIT_FAILURE, "connect");
   
   // Query request
 
   retval = query(sockfd, "Hello");
   if (retval)
-    exit_msg(EXIT_FAILURE, "Query");
+    exit_msg(EXIT_FAILURE, "query");
   
   /**
    * @brief Manual buffer read and write testing

@@ -1,4 +1,4 @@
-# Redis Server Design Doc
+# Redis Key-Value Store Design Doc
 
 ## Properties
 
@@ -97,10 +97,14 @@ in the library functions manual on `man 3 byteorder`.
 
 ### Socket I/O
 
-For data transmission on a socket, the `recv` and `send` syscalls will be used.
-Since both operations may return `-1` when an error has occured, the `ssize_t`
-data type will be used to retrieve the return value. The `recv` call is for
-reading buffer data and `send` is for writing data to the buffer.
+For data transmission on a socket,
+the `recv` and `send` syscalls will be used.
+Since both operations may return `-1` when
+an error has occured, the `ssize_t`
+data type will be used to retrieve the
+return value. The `recv` call is for
+reading buffer data and `send` is for
+writing data to the buffer.
 
 **TCP Server**
 
@@ -131,11 +135,24 @@ close(fd)
 
 ### Request-Response Control Procedure
 
-When processing a client request server-side, the receiving buffer size should be initialized with the message byte size limit. If any fixed-size padding is included in the request-response protocol, this is to be included in the read buffer size initialization. If `errno` is used, it may be cleared to `0` before running the full `recv()` or `read()` procedure, as to cover `EOF` and `error` codes. When the message length value is extracted from the fixed-size header, the length must not exceed the size limit. A basic overflow error handle will suffice. Once the message has been processed, a server response may be sent. Moreover, `memcpy()` may be used to copy select bytes from a `src` to a `dest`.
+When processing a client request server-side, the receiving buffer size
+should be initialized with the message byte size limit. If any fixed-size
+padding is included in the request-response protocol, this is to be
+included in the read buffer size initialization. If `errno` is used,
+it may be cleared to `0` before running the full `recv()` or `read()`
+procedure, as to cover `EOF` and `error` codes. When the message length
+value is extracted from the fixed-size header, the length must not exceed
+the size limit. A basic overflow error handle will suffice.
+Once the message has been processed, a server response may be sent.
+Moreover, `memcpy()` may be used to copy select bytes from a `src` to a `dest`.
 
 ### RESP Protocol Specification
 
-Clients write commands and queries to the server as an array of bulk (binary) strings. String encoding is prefixed by a `$` as the first byte, followed by a base-10 value representing the length of the message. After the header, the message is wrapped in `\r\n` (CRLF) on both sides as terminating delimiters.
+Clients write commands and queries to the server as an array
+of bulk (binary) strings. String encoding is prefixed by
+a `$` as the first byte, followed by a base-10 value representing
+the length of the message. After the header, the message is
+wrapped in `\r\n` (CRLF) on both sides as terminating delimiters.
 
 ### RESP Protocol Parsing Algorithm
 
@@ -197,11 +214,22 @@ parse_integer():
 
 ### Non-Blocking I/O Mode
 
-To set a socket handle (file descriptor) to non-blocking mode for event-driven concurrency, the `fcntl` syscall may be used. Man page documentation can be accessed using `man 2 fcntl`, which describes all available operations. Socket handle flags, such as the `O_NONBLOCK` flag, are listed in the `man 2 open` manual. The `O_NONBLOCK` flag is used to modify a file descriptor's behavior to non-blocking.
+To set a socket handle (file descriptor) to non-blocking mode for
+event-driven concurrency, the `fcntl` syscall may be used.
+Man page documentation can be accessed using `man 2 fcntl`,
+which describes all available operations. Socket handle flags,
+such as the `O_NONBLOCK` flag, are listed in the `man 2 open` manual.
+The `O_NONBLOCK` flag is used to modify a file descriptor's behavior to non-blocking.
 
 ### I/O Event Notification
 
-To achieve event-driven concurrency, the framework used for this program will use `poll` or `epoll` (Linux-specific) to monitor multiple socket handle file descriptors at the same time. The `select` syscall will not be used because it can only handle 1024 file descriptors, which is a low limit for most modern applications. To use `epoll` the `epoll_ctl` control interface is implemented, which is used to add, modify, or remove file descriptors from the relevant list.
+To achieve event-driven concurrency, the framework used for this program
+will use `poll` or `epoll` (Linux-specific) to monitor multiple socket handle
+file descriptors at the same time. The `select` syscall will not be used
+because it can only handle 1024 file descriptors, which is a low limit
+for most modern applications. To use `epoll` the `epoll_ctl` control interface
+is implemented, which is used to add, modify, or remove file descriptors
+from the relevant list.
 
 ### Server Event Loop Algorithm
 
@@ -225,3 +253,17 @@ while true:
   endfor
 endwhile
 ```
+
+### Event-Driven Concurrency with Epoll and Nonblocking
+
+To set a connected socket fd to nonblocking,
+source the fd flag values with `fcntl(sockfd, F_GETFL, 0)`,
+set the nonblocking flag by bit masking `flags | O_NONBLOCK`,
+then pass it into file control again to set
+the socket flags with `fcntl(sockfd, F_SETFL, flags)`.
+The `errno` may be handled by checking the retval of `F_SETFL`.
+For adding a socket file descriptor to the epoll interest list,
+use the `epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, &event)` syscall,
+passing in the epoll file descriptor `epollfd`,
+the add flag `EPOLL_CTL_ADD`, the connected socket of interest `sockfd`,
+and the reference to the `epoll_event` struct.

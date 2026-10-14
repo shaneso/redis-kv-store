@@ -8,6 +8,7 @@
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
+#include <fcntl.h>
 #include <iostream>
 // project
 #include "src/utils/utils.h"
@@ -27,7 +28,7 @@ ssize_t proc_request(int connfd) {
   int32_t retval = recv_full(connfd, rbuf, 4);
   // Check if EOF or receive error
   if (retval) {
-    exit_msg(EXIT_FAILURE, errno == 0 ? "EOF" : "Receive");
+    exit_msg(EXIT_FAILURE, errno == 0 ? "EOF" : "receive");
     return retval;
   }
   uint32_t len = 0;
@@ -35,12 +36,12 @@ ssize_t proc_request(int connfd) {
   memcpy(&len, rbuf, 4);
   // Check for message size overflow
   if (len > BUFFER_SIZE) {
-    exit_msg(EXIT_FAILURE, "Overflow");
+    exit_msg(EXIT_FAILURE, "overflow");
     return -1;
   }
   retval = recv_full(connfd, &rbuf[4], len);
   if (retval) {
-    exit_msg(EXIT_FAILURE, "Receive");
+    exit_msg(EXIT_FAILURE, "receive");
     return retval;
   }
   std::cout << "Client: " << &rbuf[4] << std::endl;
@@ -66,7 +67,7 @@ int main() {
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   // Check socket handle has been returned successfully
   if (sockfd == -1)
-    exit_msg(EXIT_FAILURE, "Socket");
+    exit_msg(EXIT_FAILURE, "socket");
 
   int opt_value = 1; // Set socket option value param
 
@@ -74,7 +75,7 @@ int main() {
   retval = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt_value, sizeof(opt_value));
   // Check if socket options have been set
   if (retval == -1)
-    exit_msg(EXIT_FAILURE, "Socket option");
+    exit_msg(EXIT_FAILURE, "socket option");
 
   // Initialize server socket endpoint scheme
   struct sockaddr_in serv_addr = {
@@ -95,20 +96,20 @@ int main() {
 
   // Check bind status
   if (retval == -1)
-    exit_msg(EXIT_FAILURE, "Bind");
+    exit_msg(EXIT_FAILURE, "bind");
   
   // Listen for connections on a socket
   retval = listen(sockfd, BACKLOG);
 
   // Check if socket is established as passive
   if (retval == -1)
-    exit_msg(EXIT_FAILURE, "Listen");
+    exit_msg(EXIT_FAILURE, "listen");
 
   // Create file descriptor referring to an epoll instance
   int epollfd = epoll_create1(0);
 
   if (epollfd == -1) {
-    exit_msg(EXIT_FAILURE, "Epoll");
+    exit_msg(EXIT_FAILURE, "epoll create");
   }
 
   // Accept and handle client connections
@@ -120,6 +121,10 @@ int main() {
     // Accept client connection request and return socket handle
     // addrlen_c passed to accept syscall as pointer
     connfd = accept(sockfd, (struct sockaddr*) &client_addr, &addrlen_c);
+    // Set fd to nonblocking I/O
+    set_nonblock(connfd);
+    // Add connfd to epoll interest list
+    epoll_add(epollfd, connfd);
     // Check if client connection request has been accepted
     if (connfd < 0) continue;
     // msg(EXIT_FAILURE, "Accept");
