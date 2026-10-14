@@ -5,13 +5,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Compiler warnings
-add_compile_options(-Wall -Wextra -Werror)
+add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
 # Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # Server executable
-add_executable(kv_store_server src/server/server.cc)
+add_executable(kv_store_server src/net/server.cc)
 
 # Client executable
-add_executable(kv_store_client src/server/client.cc)
+add_executable(kv_store_client src/net/client.cc)
