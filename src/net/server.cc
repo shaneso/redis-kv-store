@@ -28,7 +28,11 @@ ssize_t proc_request(int connfd) {
   int32_t retval = recv_full(connfd, rbuf, 4);
   // Check if EOF or receive error
   if (retval) {
-    exit_msg(EXIT_FAILURE, errno == 0 ? "EOF" : "receive");
+    if (errno == EAGAIN || errno == EWOULDBLOCK) {
+      exit_msg(EXIT_FAILURE, "nonblocking");
+    } else {
+      exit_msg(EXIT_FAILURE, "receive");
+    }
     return retval;
   }
   uint32_t len = 0;
@@ -122,9 +126,12 @@ int main() {
     // addrlen_c passed to accept syscall as pointer
     connfd = accept(sockfd, (struct sockaddr*) &client_addr, &addrlen_c);
     // Set fd to nonblocking I/O
-    set_nonblock(connfd);
+    retval = set_nonblock((int64_t) connfd);
+    if (retval == -1) {
+      exit_msg(EXIT_FAILURE, "nonblocking");
+    }
     // Add connfd to epoll interest list
-    epoll_add(epollfd, connfd);
+    // epoll_add(epollfd, connfd);
     // Check if client connection request has been accepted
     if (connfd < 0) continue;
     // msg(EXIT_FAILURE, "Accept");

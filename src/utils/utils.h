@@ -21,7 +21,8 @@
  */
 inline void exit_msg(int exit_code, const char* message) {
   std::cerr << "[" << "errno: " << exit_code << "] " << std::endl;
-  std::cerr << "[" << message << "] " << std::strerror(errno) << std::endl;
+  std::cerr << "[" << message << "]" << std::endl;
+  std::cerr << std::strerror(errno) << std::endl;
   std::exit(exit_code);
 }
 
@@ -77,17 +78,11 @@ inline ssize_t send_full(int sockfd, char *buf, size_t len) {
 
 /**
  * @brief Set fd to non-blocking I/O
+ * set_nonblock is implemented in x86_64 att_syntax
  *
  * @param sockfd is the socket handle file descriptor
  */
-inline void set_nonblock(int sockfd) {
-  int32_t fd_flags = fcntl(sockfd, F_GETFL, 0);
-  ssize_t retval = fcntl(sockfd, F_SETFL, fd_flags | O_NONBLOCK);
-  if (retval == -1) {
-    exit_msg(EXIT_FAILURE, "nonblock");
-  }
-  return;
-}
+extern "C" int64_t set_nonblock(int64_t sockfd);
 
 /**
  * @brief Adds a socket fd to the epoll interest list
@@ -95,14 +90,14 @@ inline void set_nonblock(int sockfd) {
  * @param epollfd is the epoll file descriptor
  * @param sockfd is the socket file descriptor
  */
-inline void epoll_add(int epollfd, int sockfd) {
-  // TODO Initialize epoll_event struct and pass as arg to epoll_ctl
-  ssize_t retval = epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, );
-  if (retval == -1) {
-    exit_msg(EXIT_FAILURE, "epoll ctl");
-  }
-  return;
-}
+// inline void epoll_add(int epollfd, int sockfd) {
+//   // TODO Initialize epoll_event struct and pass as arg to epoll_ctl
+//   ssize_t retval = epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, );
+//   if (retval == -1) {
+//     exit_msg(EXIT_FAILURE, "epoll ctl");
+//   }
+//   return;
+// }
 
 #endif // UTILS_H
 
