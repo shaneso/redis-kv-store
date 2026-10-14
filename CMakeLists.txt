@@ -11,7 +11,7 @@ add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # Server executable
-add_executable(kv_store_server src/net/server.cc)
+add_executable(kv_store_server src/net/server.cc src/utils/utils.S)
 
 # Client executable
 add_executable(kv_store_client src/net/client.cc)
