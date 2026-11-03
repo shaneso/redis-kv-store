@@ -40,6 +40,8 @@ lib functions (`3`), and misc (`7`).
 | `accept`      | `#include <sys/socket.h>`  | `man 2 accept`          |
 | `bind`        | `#include <sys/socket.h>`  | `man 2 bind`            |
 | `epoll`       | `#include <sys/epoll.h>`   | `man 7 epoll`           |
+| `epoll_ctl`   | `#include <sys/epoll.h>`   | `man 2 epoll_ctl`       |
+| `fcntl`       | `#include <fcntl.h>`       | `man 2 fcntl`           |
 | `getpeername` | `#include <sys/socket.h>`  | `man 3 getpeername`     |
 | `getprotoent` | `#include <netdb.h>`       | `man 3 getprotoent`     |
 | `getsockname` | `#include <sys/socket.h>`  | `man 3 getsockname`     |
@@ -267,3 +269,11 @@ use the `epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, &event)` syscall,
 passing in the epoll file descriptor `epollfd`,
 the add flag `EPOLL_CTL_ADD`, the connected socket of interest `sockfd`,
 and the reference to the `epoll_event` struct.
+
+### Epoll Control Operations
+
+| Operation | Description |
+| --------- | ----------- |
+| `EPOLL_CTL_ADD` | Add an entry to the interest list of the epoll file descriptor |
+| `EPOLL_CTL_MOD` | Change the settings associated with fd in the interest list to the new settings specified in event |
+| `EPOLL_CTL_DEL` | Remove (deregister) the target file descriptor fd from the interest list |
