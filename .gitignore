@@ -1,0 +1,11 @@
+# Build output
+
+build/
+
+# CMake
+
+CMakeFiles/
+CMakeScripts/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
