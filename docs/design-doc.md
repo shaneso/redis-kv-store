@@ -270,10 +270,60 @@ passing in the epoll file descriptor `epollfd`,
 the add flag `EPOLL_CTL_ADD`, the connected socket of interest `sockfd`,
 and the reference to the `epoll_event` struct.
 
-### Epoll Control Operations
+### Operations for `epoll_ctl`
 
 | Operation | Description |
 | --------- | ----------- |
 | `EPOLL_CTL_ADD` | Add an entry to the interest list of the epoll file descriptor |
 | `EPOLL_CTL_MOD` | Change the settings associated with fd in the interest list to the new settings specified in event |
 | `EPOLL_CTL_DEL` | Remove (deregister) the target file descriptor fd from the interest list |
+
+### `set_nonblock` x86_64 AT&T Implementation
+
+```asm
+set_nonblock:
+  # rdi = sockfd
+  # r10 = fd_flags
+  # r11 = option
+
+  # Get socket fd flags
+  # fcntl (72)
+  movq $72, %rax
+  # F_GETFL (3)
+  movq $3, %rsi
+  xor %rdx, %rdx
+  # Call fcntl
+  syscall
+  movq %rax, %r10
+
+  # Set socket fd flags
+  # fcntl (72)
+  movq $72, %rax
+  # F_SETFL (4)
+  movq $4, %rsi
+  # O_NONBLOCK (1 << 11)
+  movq $1, %r11
+  shl $11, %r11
+  # fd_flags |= O_NONBLOCK
+  or %r11, %r10
+  movq %r10, %rdx
+  # Call fcntl
+  syscall
+  ret
+```
+
+### `epoll_add` x86_64 AT&T Implementation
+
+```asm
+epoll_add:
+  # epoll_ctl (233)
+  movq $233, %rax
+  # epoll event to arg4
+  movq %rdx, %r10
+  # sockfd to arg 3
+  movq %rsi, %rdx
+  # op = EPOLL_CTL_ADD (1)
+  movq $1, %rsi
+  syscall
+  ret
+```
