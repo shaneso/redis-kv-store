@@ -15,3 +15,15 @@ add_executable(kv_store_server src/net/server.cc src/utils/utils.S)
 
 # Client executable
 add_executable(kv_store_client src/net/client.cc src/utils/utils.S)
+
+# Target sources
+
+target_sources(kv_store_server
+  PRIVATE
+    src/net/server.cc
+)
+
+target_sources(kv_store_client
+  PRIVATE
+    src/net/client.cc
+)
