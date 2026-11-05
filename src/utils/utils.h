@@ -9,6 +9,7 @@
 #include <cstring>
 #include <fcntl.h>
 #include <iostream>
+#include <sys/epoll.h>
 
 // Maximum buffer message byte size
 #define BUFFER_SIZE 0x20000
@@ -90,14 +91,7 @@ extern "C" int64_t set_nonblock(int64_t sockfd);
  * @param epollfd is the epoll file descriptor
  * @param sockfd is the socket file descriptor
  */
-// inline void epoll_add(int epollfd, int sockfd) {
-//   // TODO Initialize epoll_event struct and pass as arg to epoll_ctl
-//   ssize_t retval = epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, );
-//   if (retval == -1) {
-//     exit_msg(EXIT_FAILURE, "epoll ctl");
-//   }
-//   return;
-// }
+extern "C" int64_t epoll_add(int64_t epollfd, int64_t sockfd, epoll_event* event);
 
 #endif // UTILS_H
 

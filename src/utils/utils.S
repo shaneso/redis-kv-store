@@ -1,6 +1,16 @@
+# Utility functions and syscall operations
+# Implemented for x86_64 systems
+# Shane So
+
 .section .note.GNU-stack,""
 .global set_nonblock
+.global epoll_add
+.bss
+.data
 .text
+
+# set_nonblock
+# Sets the connected socket to nonblocking
 
 set_nonblock:
   # rdi = sockfd
@@ -29,5 +39,24 @@ set_nonblock:
   or %r11, %r10
   movq %r10, %rdx
   # Call fcntl
+  syscall
+  ret
+
+# epoll_add
+# Uses the epoll control interface to add
+# a connected socket to the interest list
+# @param epollfd
+# @param sockfd
+# @param pointer to an epoll_event struct
+
+epoll_add:
+  # epoll_ctl (233)
+  movq $233, %rax
+  # epoll event to arg4
+  movq %rdx, %r10
+  # sockfd to arg 3
+  movq %rsi, %rdx
+  # op = EPOLL_CTL_ADD (1)
+  movq $1, %rsi
   syscall
   ret

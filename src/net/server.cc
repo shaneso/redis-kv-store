@@ -117,7 +117,7 @@ int main() {
   }
 
   // Accept and handle client connections
-  while (1) {
+  for (;;) {
     // Initialize client socket endpoint scheme
     struct sockaddr_in client_addr = {};
     // Initialize client endpoint address length (IP protocol-agnostic)
@@ -131,11 +131,19 @@ int main() {
       exit_msg(EXIT_FAILURE, "nonblocking");
     }
     // Add connfd to epoll interest list
+    // epoll event
+    struct epoll_event event;
+    event.events = EPOLLIN;
+    event.data.fd = connfd;
     // epoll_add(epollfd, connfd);
+    retval = epoll_add(epollfd, connfd, &event);
+    if (retval == -1) {
+      exit_msg(EXIT_FAILURE, "epoll add");
+    }
     // Check if client connection request has been accepted
     if (connfd < 0) continue;
     // msg(EXIT_FAILURE, "Accept");
-    while (1) {
+    for (;;) {
       ssize_t retval = proc_request(connfd);
       if (retval) break;
     }
