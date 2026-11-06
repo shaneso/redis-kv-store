@@ -90,8 +90,18 @@ extern "C" int64_t set_nonblock(int64_t sockfd);
  *
  * @param epollfd is the epoll file descriptor
  * @param sockfd is the socket file descriptor
+ * @param event is the epoll event struct pointer
  */
 extern "C" int64_t epoll_add(int64_t epollfd, int64_t sockfd, epoll_event* event);
+
+/**
+ * @brief Removes a socket fd from the epoll interest list
+ *
+ * @param epollfd is the epoll file descriptor
+ * @param sockfd is the socket file descriptor
+ * @param event is the epoll event struct pointer
+ */
+extern "C" int64_t epoll_remove(int64_t epollfd, int64_t sockfd, epoll_event* event);
 
 #endif // UTILS_H
 

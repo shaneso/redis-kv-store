@@ -60,3 +60,22 @@ epoll_add:
   movq $1, %rsi
   syscall
   ret
+
+# epoll_remove
+# Uses the epoll control interface to remove
+# a connected socket from the interest list
+# @param epollfd
+# @param sockfd
+# @param pointer to an epoll_event struct
+
+epoll_remove:
+  # epoll_ctl (233)
+  movq $233, %rax
+  # epoll event to arg4
+  movq %rdx, %r10
+  # sockfd to arg 3
+  movq %rsi, %rdx
+  # op = EPOLL_CTL_DEL (2)
+  movq $2, %rsi
+  syscall
+  ret
