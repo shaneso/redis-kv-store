@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 // system
 #include <arpa/inet.h>
 #include <netinet/in.h>

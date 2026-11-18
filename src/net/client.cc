@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 // system
 #include <netinet/in.h>
 #include <sys/socket.h>
