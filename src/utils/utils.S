@@ -5,6 +5,7 @@
 .section .note.GNU-stack,""
 .global set_nonblock
 .global epoll_add
+.global epoll_remove
 .bss
 .data
 .text
