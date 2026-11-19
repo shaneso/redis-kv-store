@@ -1,10 +1,33 @@
 # Redis KV Store Performance and Benchmarking Documentation
 
+Shane Liam H. So
+
 Date format in `Y-m-d`
 
 ## 2026-11-18 Cache and Memory Usage Test
 
 This test was completed on version commit `0x630fb59`.
+
+### CPU Specifications
+
+Here are selected specifications for the processor used in testing.
+
+| Specification      | Information                          |
+| -------------      | -----------                          |
+| Architecture       | x86_64                               |
+| CPU op-mode(s)     | 32-bit, 64-bit                       |
+| Address sizes      | 39 bits physical, 48 bits virtual    |
+| Byte Order         | Little Endian                        |
+| CPU(s)             | 16                                   |
+| Vendor ID          | GenuineIntel                         |
+| Model name         | 13th Gen Intel(R) Core(TM) i7-13620H |
+| CPU family         | 6                                    |
+| Model              | 186                                  |
+| Thread(s) per core | 2                                    |
+| Core(s) per socket | 10                                   |
+| CPU(s) scaling MHz | 32%                                  |
+| CPU max MHz        | 4900.0000                            |
+| CPU min MHz        | 400.0000                             |
 
 ### Cache Metrics
 
